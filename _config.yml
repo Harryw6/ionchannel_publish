@@ -30,6 +30,9 @@ include:
   - _config.yml
   - index.html
   - mpnn_results.csv
+  - script.js
+  - start_server.bat
+  - style.css
   - all_pdb
 
 # GitHub Pages settings
