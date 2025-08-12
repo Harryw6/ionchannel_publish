@@ -1,51 +1,75 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>离子通道数据展示</title>
-    <link rel="stylesheet" href="./styles.css">
+    <!-- 支持 GitHub Pages baseurl -->
+    <base href="{{ site.baseurl }}">
+    <title>Ion Channel Data Viewer</title>
+    <link rel="stylesheet" href="styles.css">
   </head>
 <body>
     <div class="container">
         <header>
-            <h1>离子通道数据展示</h1>
-            <p>展示各种离子通道的结构数据和PDB文件</p>
+            <h1>Ion Channel Data Viewer</h1>
+            <p>Display structural data and PDB files for various ion channels</p>
         </header>
         
         <main>
             <section class="data-section">
-                <h2>离子通道数据表</h2>
+                <h2>Ion Channel Data Table</h2>
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="输入关键词筛选离子通道 (如: Na, BK, KCNQ, Nav1.2)">
-                    <button id="clearSearch">清除</button>
+                    <input type="text" id="searchInput" placeholder="Enter keywords to filter ion channels (e.g., Na, BK, KCNQ, Nav1.2)">
+                    <button id="clearSearch">Clear</button>
                 </div>
-                <div class="table-container">
-                    <table id="dataTable">
-                        <thead>
-                            <tr>
-                                <th>通道名称</th>
-                                <th data-sortable="true" data-column="design">设计编号</th>
-                                <th data-sortable="true" data-column="n">变体</th>
-                                <th data-sortable="true" data-column="mpnn">MPNN分数</th>
-                                <th data-sortable="true" data-column="plddt">pLDDT</th>
-                                <th data-sortable="true" data-column="i_ptm">ipTM</th>
-                                <th data-sortable="true" data-column="i_pae">ipAE</th>
-                                <th data-sortable="true" data-column="rmsd">RMSD</th>
-                                <th data-sortable="true" data-column="seq">序列</th>
-                                <th data-sortable="true" data-column="extracted_seq">Seq</th>
-                                <th>PDB文件</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                        </tbody>
-                    </table>
+                <div class="table-wrapper">
+                    <!-- 固定表头 -->
+                    <div class="header-container">
+                        <table id="headerTable">
+                            <thead>
+                                <tr>
+                                    <th>Channel Name</th>
+                                    <th data-sortable="true" data-column="design">Design</th>
+                                    <th data-sortable="true" data-column="n">N</th>
+                                    <th data-sortable="true" data-column="mpnn">MPNN Score</th>
+                                    <th data-sortable="true" data-column="plddt">pLDDT</th>
+                                    <th data-sortable="true" data-column="i_ptm">ipTM</th>
+                                    <th data-sortable="true" data-column="i_pae">ipAE</th>
+                                    <th data-sortable="true" data-column="rmsd">RMSD</th>
+                                    <th data-sortable="true" data-column="extracted_seq">Seq</th>
+                                    <th>PDB File</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    
+                    <!-- 可滚动的表格内容 -->
+                    <div class="table-container">
+                        <table id="dataTable">
+                            <thead style="visibility: collapse;">
+                                <tr>
+                                    <th>Channel Name</th>
+                                    <th>Design Number</th>
+                                    <th>Variant</th>
+                                    <th>MPNN Score</th>
+                                    <th>pLDDT</th>
+                                    <th>ipTM</th>
+                                    <th>ipAE</th>
+                                    <th>RMSD</th>
+                                    <th>Seq</th>
+                                    <th>PDB File</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
             
                     </main>
     </div>
     
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
