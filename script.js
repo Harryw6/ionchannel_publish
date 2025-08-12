@@ -311,24 +311,54 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
     downloadPDB(filename, displayName) {
         // 创建下载链接
         const link = document.createElement('a');
-        // 支持 GitHub Pages baseurl
+        
+        // 处理 baseurl - 检查是否是开发环境
         const baseUrl = document.querySelector('base')?.getAttribute('href') || '';
-        link.href = `${baseUrl}all_pdb/${filename}`;
+        let finalUrl;
+        
+        // 如果 baseurl 包含 Jekyll 模板语法或为空，使用相对路径
+        if (baseUrl.includes('{{') || baseUrl === '' || baseUrl === '/') {
+            finalUrl = `all_pdb/${filename}`;
+        } else {
+            finalUrl = `${baseUrl}all_pdb/${filename}`;
+        }
+        
+        link.href = finalUrl;
         link.download = `${displayName}.pdb`;
         
-        // 由于浏览器跨域限制，显示提示信息
-        link.addEventListener('error', () => {
-            alert(`Due to browser security restrictions, cannot directly download ${filename}\nPlease manually get the file from the all_pdb folder`);
-        });
-        
-        // 尝试下载，如果失败则显示提示
-        try {
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (error) {
-            alert(`Due to browser security restrictions, cannot directly download ${filename}\nPlease manually get the file from the all_pdb folder`);
-        }
+        // 测试文件是否存在
+        fetch(finalUrl, { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    // 文件存在，执行下载
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    // 文件不存在，显示错误
+                    this.showDownloadError(filename, finalUrl);
+                }
+            })
+            .catch(error => {
+                // 网络错误，尝试直接下载
+                try {
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (err) {
+                    this.showDownloadError(filename, finalUrl);
+                }
+            });
+    }
+    
+    showDownloadError(filename, url) {
+        const errorMessage = `Unable to download PDB file: ${filename}\n` +
+                           `URL: ${url}\n\n` +
+                           `Please check:\n` +
+                           `1. The file exists in the all_pdb/ directory\n` +
+                           `2. GitHub Pages deployment completed successfully\n` +
+                           `3. File permissions are correct`;
+        alert(errorMessage);
     }
 
     filterData(searchTerm) {
@@ -341,18 +371,8 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
 
         const filteredData = this.data.filter(row => {
             const searchLower = searchTerm.toLowerCase();
-            // 优先匹配通道名称开头，然后搜索其他字段
-            return (
-                row.Channel.toLowerCase().startsWith(searchLower) ||
-                row.design.toString().includes(searchLower) ||
-                row.n.toString().includes(searchLower) ||
-                row.mpnn.includes(searchLower) ||
-                row.plddt.includes(searchLower) ||
-                row.i_ptm.includes(searchLower) ||
-                row.i_pae.includes(searchLower) ||
-                row.rmsd.includes(searchLower) ||
-                row.extracted_seq.toLowerCase().includes(searchLower)
-            );
+            // 只匹配通道名称开头，确保搜索"K"只显示K开头的通道
+            return row.Channel.toLowerCase().startsWith(searchLower);
         });
 
         this.renderTable(filteredData);
