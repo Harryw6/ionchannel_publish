@@ -42,7 +42,7 @@ class IonChannelViewer {
             this.renderTable();
             this.setupSortableHeaders();
         } catch (error) {
-            console.error('初始化失败:', error);
+            console.error('Initialization failed:', error);
         }
     }
 
@@ -53,15 +53,15 @@ class IonChannelViewer {
             if (response.ok) {
                 const csvText = await response.text();
                 this.data = this.parseCSV(csvText);
-                console.log('通过fetch加载的数据:', this.data.length, '条记录');
+                console.log('Data loaded via fetch:', this.data.length, 'records');
                 return;
             }
         } catch (error) {
-            console.log('fetch方法失败，尝试其他方法...');
+            console.log('Fetch method failed, trying alternative...');
         }
 
         // 如果fetch失败，使用嵌入的备份数据（适用于本地文件环境）
-        console.log('使用嵌入的备份数据...');
+        console.log('Using embedded backup data...');
         const backupData = `Channel,design,n,mpnn,plddt,i_ptm,i_pae,rmsd,seq
 Nav1.2,0,0,1.670964132,0.264105022,0.10404928,25.90797788,28.1592617,ALIQSVKKLSDVMILTVFCLSFLGSFYLINLILAVVAMAYEEQNQATMTEEQKKYYNAMKKLGSKKPQKPIPRPANFTIGWNIFDFVVVILSIVGMFLAELIEKYFVSPTLFRVIRLARIGRILRLIKGAKGIRTLLFALMMSLPALFNIGLLLFLVMFIYAIFGMSIIISFLVVVNMYIAVILENFSVATEE/LLIVKLLAEK
 Nav1.2,0,1,1.716530679,0.305697739,0.180560946,23.28447151,31.25585365,ALIQSVKKLSDVMILTVFCLSFLGSFYLINLILAVVAMAYEEQNQATMTEEQKKYYNAMKKLGSKKPQKPIPRPANFTIGWNIFDFVVVILSIVGMFLAELIEKYFVSPTLFRVIRLARIGRILRLIKGAKGIRTLLFALMMSLPALFNIGLLLFLVMFIYAIFGMSIIISFLVVVNMYIAVILENFSVATEE/LLEVLKLAKK
@@ -81,7 +81,7 @@ KCNQ,7,0,1.560803638,0.31350708,0.168339461,23.56371921,30.58870125,ALIQSVKKLSDV
 KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDVMILTVFCLSFLGSFYLINLILAVVAMAYEEQNQATMTEEQKKYYNAMKKLGSKKPQKPIPRPANFTIGWNIFDFVVVILSIVGMFLAELIEKYFVSPTLFRVIRLARIGRILRLIKGAKGIRTLLFALMMSLPALFNIGLLLFLVMFIYAIFGMSIIISFLVVVNMYIAVILENFSVATEE/KSLYEIIKEL`;
         
         this.data = this.parseCSV(backupData);
-        console.log('使用备份数据加载:', this.data.length, '条记录');
+        console.log('Loaded backup data:', this.data.length, 'records');
         
         // 显示提示信息
         this.showDataUpdateNotice();
@@ -102,8 +102,8 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
             animation: fadeIn 0.5s ease-out;
         `;
         notice.innerHTML = `
-            <strong>💡 提示：</strong>当前使用的是嵌入数据<br>
-            <small>如需使用最新CSV数据，请通过本地服务器运行网站</small>
+            <strong>💡 Notice:</strong> Currently using embedded data<br>
+            <small>To use the latest CSV data, please run the website via a local server</small>
             <button onclick="this.parentElement.remove()" style="
                 background: rgba(255,255,255,0.2);
                 border: none;
@@ -175,14 +175,50 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
                 <td class="${this.getScoreClass(parseFloat(row.i_ptm), 0.5, 0.3)}">${row.i_ptm}</td>
                 <td class="${this.getScoreClass(parseFloat(row.i_pae), 0.3, 0.2)}">${row.i_pae}</td>
                 <td class="${this.getScoreClass(parseFloat(row.rmsd), 20, 30, true)}">${row.rmsd}</td>
-                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${row.seq}">${row.seq}</td>
                 <td><strong>${extractedSeq}</strong></td>
                 <td>
-                    ${hasPDB ? `<button class="download-btn" onclick="viewer.downloadPDB('${pdbFile}', '${row.Channel}_design${row.design}_n${row.n}')">下载</button>` : '无PDB'}
+                    ${hasPDB ? `<button class="download-btn" onclick="viewer.downloadPDB('${pdbFile}', '${row.Channel}_design${row.design}_n${row.n}')">Download</button>` : 'No PDB'}
                 </td>
             `;
             
             tbody.appendChild(tr);
+        });
+
+        // 确保表头和列宽度同步
+        this.syncColumnWidths();
+    }
+
+    syncColumnWidths() {
+        const headerTable = document.getElementById('headerTable');
+        const dataTable = document.getElementById('dataTable');
+        const headerCells = headerTable.querySelectorAll('th');
+        const bodyCells = dataTable.querySelectorAll('tbody tr:first-child td');
+        
+        if (bodyCells.length > 0) {
+            headerCells.forEach((header, index) => {
+                if (bodyCells[index]) {
+                    const width = bodyCells[index].offsetWidth;
+                    header.style.width = width + 'px';
+                    header.style.minWidth = width + 'px';
+                    header.style.maxWidth = width + 'px';
+                }
+            });
+        }
+
+        // 同步水平滚动
+        this.setupScrollSync();
+    }
+
+  setupScrollSync() {
+        const headerContainer = document.querySelector('.header-container');
+        const tableContainer = document.querySelector('.table-container');
+        
+        tableContainer.addEventListener('scroll', () => {
+            headerContainer.scrollLeft = tableContainer.scrollLeft;
+        });
+        
+        headerContainer.addEventListener('scroll', () => {
+            tableContainer.scrollLeft = headerContainer.scrollLeft;
         });
     }
 
@@ -238,7 +274,7 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
 
     updateSortIndicators() {
         // 移除所有排序指示器
-        const headers = document.querySelectorAll('th[data-sortable]');
+        const headers = document.querySelectorAll('#headerTable th[data-sortable]');
         headers.forEach(header => {
             header.classList.remove('sort-asc', 'sort-desc');
             const indicator = header.querySelector('.sort-indicator');
@@ -249,7 +285,7 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
         
         // 添加当前排序指示器
         if (this.currentSort.column) {
-            const currentHeader = document.querySelector(`th[data-column="${this.currentSort.column}"]`);
+            const currentHeader = document.querySelector(`#headerTable th[data-column="${this.currentSort.column}"]`);
             if (currentHeader) {
                 currentHeader.classList.add(this.currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
                 const indicator = document.createElement('span');
@@ -261,7 +297,7 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
     }
 
     setupSortableHeaders() {
-        const sortableHeaders = document.querySelectorAll('th[data-sortable]');
+        const sortableHeaders = document.querySelectorAll('#headerTable th[data-sortable]');
         sortableHeaders.forEach(header => {
             header.style.cursor = 'pointer';
             header.addEventListener('click', () => {
@@ -275,12 +311,14 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
     downloadPDB(filename, displayName) {
         // 创建下载链接
         const link = document.createElement('a');
-        link.href = `all_pdb/${filename}`;
+        // 支持 GitHub Pages baseurl
+        const baseUrl = document.querySelector('base')?.getAttribute('href') || '';
+        link.href = `${baseUrl}all_pdb/${filename}`;
         link.download = `${displayName}.pdb`;
         
         // 由于浏览器跨域限制，显示提示信息
         link.addEventListener('error', () => {
-            alert(`由于浏览器安全限制，无法直接下载 ${filename}\n请手动从 all_pdb 文件夹中获取该文件`);
+            alert(`Due to browser security restrictions, cannot directly download ${filename}\nPlease manually get the file from the all_pdb folder`);
         });
         
         // 尝试下载，如果失败则显示提示
@@ -289,7 +327,7 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
             link.click();
             document.body.removeChild(link);
         } catch (error) {
-            alert(`由于浏览器安全限制，无法直接下载 ${filename}\n请手动从 all_pdb 文件夹中获取该文件`);
+            alert(`Due to browser security restrictions, cannot directly download ${filename}\nPlease manually get the file from the all_pdb folder`);
         }
     }
 
@@ -303,9 +341,9 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
 
         const filteredData = this.data.filter(row => {
             const searchLower = searchTerm.toLowerCase();
-            // 搜索通道名称、设计编号、变体编号等字段
+            // 优先匹配通道名称开头，然后搜索其他字段
             return (
-                row.Channel.toLowerCase().includes(searchLower) ||
+                row.Channel.toLowerCase().startsWith(searchLower) ||
                 row.design.toString().includes(searchLower) ||
                 row.n.toString().includes(searchLower) ||
                 row.mpnn.includes(searchLower) ||
@@ -313,7 +351,6 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
                 row.i_ptm.includes(searchLower) ||
                 row.i_pae.includes(searchLower) ||
                 row.rmsd.includes(searchLower) ||
-                row.seq.toLowerCase().includes(searchLower) ||
                 row.extracted_seq.toLowerCase().includes(searchLower)
             );
         });
@@ -333,7 +370,7 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
         if (filteredCount < totalCount) {
             const countElement = document.createElement('div');
             countElement.className = 'search-result-count';
-            countElement.textContent = `显示 ${filteredCount} / ${totalCount} 条结果`;
+            countElement.textContent = `Showing ${filteredCount} / ${totalCount} results`;
             searchInput.parentNode.appendChild(countElement);
         }
     }
@@ -342,5 +379,5 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
 const viewer = new IonChannelViewer();
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('离子通道数据查看器已加载');
+    console.log('Ion Channel Data Viewer loaded');
 });
