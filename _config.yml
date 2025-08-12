@@ -32,7 +32,7 @@ include:
   - mpnn_results.csv
   - script.js
   - start_server.bat
-  - style.css
+  - styles.css
   - all_pdb
 
 # GitHub Pages settings
