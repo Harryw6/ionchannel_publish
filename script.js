@@ -371,18 +371,8 @@ KCNQ,7,1,1.33681414,0.553117067,0.479515672,16.27376497,32.23592377,ALIQSVKKLSDV
 
         const filteredData = this.data.filter(row => {
             const searchLower = searchTerm.toLowerCase();
-            // 优先匹配通道名称开头，然后搜索其他字段
-            return (
-                row.Channel.toLowerCase().startsWith(searchLower) ||
-                row.design.toString().includes(searchLower) ||
-                row.n.toString().includes(searchLower) ||
-                row.mpnn.includes(searchLower) ||
-                row.plddt.includes(searchLower) ||
-                row.i_ptm.includes(searchLower) ||
-                row.i_pae.includes(searchLower) ||
-                row.rmsd.includes(searchLower) ||
-                row.extracted_seq.toLowerCase().includes(searchLower)
-            );
+            // 只匹配通道名称开头，确保搜索"K"只显示K开头的通道
+            return row.Channel.toLowerCase().startsWith(searchLower);
         });
 
         this.renderTable(filteredData);
