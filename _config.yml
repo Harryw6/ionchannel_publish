@@ -33,7 +33,7 @@ include:
   - script.js
   - start_server.bat
   - styles.css
-  - all_pdb
+  - all_pdb/*
 
 # GitHub Pages settings
 github:
