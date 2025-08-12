@@ -1,6 +1,6 @@
 name: Ion Channel Data Viewer
 description: A web-based viewer for ion channel data and PDB structures
-url: https://Harryw6.github.io/ion_channel
+url: https://Harryw6.github.io/ionchannel_publish
 baseurl: /ion_channel
 
 # Build settings
