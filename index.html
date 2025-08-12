@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>离子通道数据展示</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+<body>
+    <div class="container">
+        <header>
+            <h1>离子通道数据展示</h1>
+            <p>展示各种离子通道的结构数据和PDB文件</p>
+        </header>
+        
+        <main>
+            <section class="data-section">
+                <h2>离子通道数据表</h2>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="输入关键词筛选离子通道 (如: Na, BK, KCNQ, Nav1.2)">
+                    <button id="clearSearch">清除</button>
+                </div>
+                <div class="table-container">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>通道名称</th>
+                                <th data-sortable="true" data-column="design">设计编号</th>
+                                <th data-sortable="true" data-column="n">变体</th>
+                                <th data-sortable="true" data-column="mpnn">MPNN分数</th>
+                                <th data-sortable="true" data-column="plddt">pLDDT</th>
+                                <th data-sortable="true" data-column="i_ptm">ipTM</th>
+                                <th data-sortable="true" data-column="i_pae">ipAE</th>
+                                <th data-sortable="true" data-column="rmsd">RMSD</th>
+                                <th data-sortable="true" data-column="seq">序列</th>
+                                <th data-sortable="true" data-column="extracted_seq">Seq</th>
+                                <th>PDB文件</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+                    </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
